@@ -1,0 +1,7 @@
+# Terraform state
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+
+# Terraform variables
+infra/terraform.tfvars
+
