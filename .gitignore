@@ -7,7 +7,3 @@ infra/terraform.tfvars
 
 .terraform/
 *.tfplan
-.terraform/
-*.tfplan
-.terraform/
-*.tfplan
