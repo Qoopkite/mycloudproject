@@ -1,0 +1,43 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Git 리포지터리 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2) Terraform 설치 (버전 1.4.0)
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.4.0"
+
+      # 3) Terraform 초기화
+      - name: Terraform Init
+        run: terraform -chdir=infra init
+
+      # 4) Terraform 플랜 생성
+      - name: Terraform Plan
+        run: terraform -chdir=infra plan -out=tfplan \
+              -var="key_pair_name=${{ secrets.KEY_PAIR_NAME }}" \
+              -var="db_password=${{ secrets.DB_PASSWORD }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # 5) Terraform 적용 (Apply)
+      - name: Terraform Apply
+        run: terraform -chdir=infra apply -auto-approve tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+

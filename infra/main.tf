@@ -32,6 +32,17 @@ resource "aws_subnet" "public" {
   }
 }
 
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_region}c"
+  tags = {
+    Name = "mycloudproject-public-subnet-2"
+  }
+}
+
+
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags = {
@@ -208,7 +219,7 @@ resource "aws_instance" "app_server" {
 
               # 3) CloudWatch Agent 설치 및 설정 (Ubuntu 예시)
               apt-get install -y amazon-cloudwatch-agent
-              # (cloudwatch-config.json 내용은 infra 코드에서 별도로 정의)
+               (cloudwatch-config.json 내용은 infra 코드에서 별도로 정의)
               /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config \
                 -m ec2 -c file:/home/ubuntu/mycloudproject/app/src/cloudwatch-config.json -s
               EOF
@@ -223,7 +234,7 @@ resource "aws_instance" "app_server" {
 ############################################################
 resource "aws_db_subnet_group" "main" {
   name       = "mycloudproject-db-subnet-group"
-  subnet_ids = [aws_subnet.public.id]   # 단일 AZ 실습이므로 public subnet 사용
+  subnet_ids = [aws_subnet.public.id, aws_subnet.public_2.id]
   tags = {
     Name = "mycloudproject-db-subnet-group"
   }
@@ -231,7 +242,7 @@ resource "aws_db_subnet_group" "main" {
 
 resource "aws_db_instance" "app_db" {
   engine               = "mysql"
-  instance_class       = "db.t2.micro"
+  instance_class       = "db.t3.micro"
   allocated_storage    = 20
   name                 = "appdb"
   username             = var.db_username
