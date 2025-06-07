@@ -24,13 +24,6 @@ jobs:
         working-directory: infra
         run: terraform init
 
-      - name: Terraform Import existing Role
-        working-directory: infra
-        run: terraform import aws_iam_role.ec2_role mycloudproject-ec2-role
-        env:
-          AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
       - name: Terraform Plan
         working-directory: infra
         run: |
